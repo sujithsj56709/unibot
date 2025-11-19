@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniBot - University Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4bb543;
+            --warning: #ffcc00;
+            --danger: #dc3545;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: 90vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: var(--gray);
+            margin-bottom: 15px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--dark);
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: var(--light-gray);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .quick-actions {
+            margin-top: auto;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 15px;
+            background: var(--light);
+            border: none;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            background: var(--light-gray);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: var(--secondary);
+        }
+
+        /* Chat Container Styles */
+        .chat-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+        }
+
+        .user-details h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .user-details p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--success);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            line-height: 1.5;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background: var(--light-gray);
+            border-bottom-left-radius: 5px;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            margin-top: 5px;
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .quick-reply {
+            background: white;
+            border: 1px solid var(--light-gray);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-reply:hover {
+            background: var(--light-gray);
+        }
+
+        .chat-input {
+            padding: 20px 25px;
+            border-top: 1px solid var(--light-gray);
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 1px solid var(--light-gray);
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+
+        .send-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        /* University Info Cards */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card i {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .info-card h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .info-card p {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="logo-text">UniBot</div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Main Menu</div>
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-comments"></i>
+                    Chat with UniBot
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-university"></i>
+                    University Info
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    Academic Calendar
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-book"></i>
+                    Courses & Programs
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Student Services</div>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-user-graduate"></i>
+                    Admissions
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-money-bill-wave"></i>
+                    Financial Aid
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    Campus Life
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-question-circle"></i>
+                    Student Support
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Resources</div>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-library"></i>
+                    Library
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-laptop"></i>
+                    Online Learning
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-briefcase"></i>
+                    Career Services
+                </a>
+            </div>
+            
+            <div class="quick-actions">
+                <button class="action-btn">
+                    <i class="fas fa-cog"></i>
+                    Settings
+                </button>
+                <button class="action-btn primary">
+                    <i class="fas fa-download"></i>
+                    Download App
+                </button>
+            </div>
+        </div>
+        
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-info">
+                    <div class="avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="user-details">
+                        <h2>UniBot Assistant</h2>
+                        <p>Your University AI Helper</p>
+                    </div>
+                </div>
+                <div class="status">
+                    <div class="status-dot"></div>
+                    <span>Online</span>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <p>Hello! I'm UniBot, your university assistant. How can I help you today?</p>
+                    <div class="message-time">10:00 AM</div>
+                    
+                    <div class="quick-replies">
+                        <div class="quick-reply" onclick="sendQuickReply('Admission requirements')">Admission requirements</div>
+                        <div class="quick-reply" onclick="sendQuickReply('Course information')">Course information</div>
+                        <div class="quick-reply" onclick="sendQuickReply('Campus facilities')">Campus facilities</div>
+                        <div class="quick-reply" onclick="sendQuickReply('Financial aid')">Financial aid</div>
+                    </div>
+                </div>
+                
+                <div class="message user-message">
+                    <p>Hi, I need information about computer science programs.</p>
+                    <div class="message-time">10:02 AM</div>
+                </div>
+                
+                <div class="message bot-message">
+                    <p>Our Computer Science department offers several programs including Bachelor of Science in CS, Software Engineering, and Data Science. Which specific program are you interested in?</p>
+                    <div class="message-time">10:02 AM</div>
+                    
+                    <div class="info-cards">
+                        <div class="info-card">
+                            <i class="fas fa-laptop-code"></i>
+                            <h3>BSc Computer Science</h3>
+                            <p>4-year program with focus on algorithms, systems, and theory</p>
+                        </div>
+                        <div class="info-card">
+                            <i class="fas fa-code"></i>
+                            <h3>Software Engineering</h3>
+                            <p>Focus on software development lifecycle and engineering principles</p>
+                        </div>
+                        <div class="info-card">
+                            <i class="fas fa-chart-bar"></i>
+                            <h3>Data Science</h3>
+                            <p>Combines statistics, programming, and domain knowledge</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
+                <button class="send-btn" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        
+        // Function to add a message to the chat
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <p>${message}</p>
+                <div class="message-time">${time}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Function to send a message
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message === '') return;
+            
+            addMessage(message, true);
+            messageInput.value = '';
+            
+            // Simulate bot response after a short delay
+            setTimeout(() => {
+                const botResponse = generateBotResponse(message);
+                addMessage(botResponse);
+            }, 1000);
+        }
+        
+        // Function to handle Enter key press
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        // Function to send quick reply
+        function sendQuickReply(message) {
+            addMessage(message, true);
+            
+            // Simulate bot response after a short delay
+            setTimeout(() => {
+                const botResponse = generateBotResponse(message);
+                addMessage(botResponse);
+            }, 1000);
+        }
+        
+        // Function to generate bot responses (simplified for demo)
+        function generateBotResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('admission') || lowerMessage.includes('apply')) {
+                return "Our admission requirements vary by program. Generally, we require a high school diploma with a minimum GPA of 3.0, SAT/ACT scores, and a personal statement. International students need TOEFL/IELTS scores. Would you like more specific information?";
+            } else if (lowerMessage.includes('course') || lowerMessage.includes('program')) {
+                return "We offer a wide range of programs across multiple disciplines. Our most popular programs include Computer Science, Business Administration, Engineering, and Psychology. Would you like details about a specific program?";
+            } else if (lowerMessage.includes('campus') || lowerMessage.includes('facility')) {
+                return "Our campus features state-of-the-art facilities including a new library, research centers, sports complex, and student union. We also have on-campus housing, dining options, and health services. Is there a specific facility you're interested in?";
+            } else if (lowerMessage.includes('financial') || lowerMessage.includes('aid') || lowerMessage.includes('scholarship')) {
+                return "We offer various financial aid options including scholarships, grants, loans, and work-study programs. Our financial aid office can help you explore options based on your eligibility. Would you like to schedule an appointment with a financial aid counselor?";
+            } else if (lowerMessage.includes('computer science') || lowerMessage.includes('cs')) {
+                return "Our Computer Science program is ranked among the top 50 nationally. The curriculum covers programming, algorithms, data structures, AI, and more. We also offer co-op programs with tech companies. Would you like to see the detailed curriculum?";
+            } else if (lowerMessage.includes('tuition') || lowerMessage.includes('cost')) {
+                return "Undergraduate tuition is approximately $15,000 per semester for in-state students and $25,000 for out-of-state students. This does not include housing, meals, or books. Financial aid is available to eligible students.";
+            } else if (lowerMessage.includes('deadline') || lowerMessage.includes('application')) {
+                return "The application deadline for Fall 2024 is January 15th for early decision and March 1st for regular decision. For Spring 2025, the deadline is October 15th. International students should apply at least 3 months earlier to allow for visa processing.";
+            } else if (lowerMessage.includes('housing') || lowerMessage.includes('dorm')) {
+                return "We offer several on-campus housing options ranging from traditional dorms to apartment-style living. First-year students are required to live on campus. The housing application opens on March 1st for the following academic year.";
+            } else if (lowerMessage.includes('library') || lowerMessage.includes('study')) {
+                return "Our library is open 24/7 during finals week and has over 2 million volumes, 500 computer workstations, and numerous study rooms. You can also access our digital resources from anywhere with your student login.";
+            } else {
+                return "I'm here to help with university-related questions. You can ask me about admissions, programs, campus life, financial aid, or any other university topic. How else can I assist you?";
+            }
+        }
+        
+        // Initialize with a welcome message if the chat is empty
+        window.onload = function() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        };
+    </script>
+</body>
+</html>
